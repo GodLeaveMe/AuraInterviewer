@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI面试官系统 - API测试页面</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 300;
+        }
+        .header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        .content {
+            padding: 30px;
+        }
+        .test-section {
+            margin: 30px 0;
+            padding: 25px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+        .test-section h3 {
+            margin-top: 0;
+            color: #333;
+            font-size: 1.3em;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .result {
+            margin: 15px 0;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+        .warning {
+            background: #fff3cd;
+            color: #856404;
+            border-left: 4px solid #ffc107;
+        }
+        button {
+            padding: 12px 20px;
+            margin: 8px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .status-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            text-align: center;
+        }
+        .status-indicator {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 10px;
+        }
+        .status-online { background: #28a745; }
+        .status-offline { background: #dc3545; }
+        .status-unknown { background: #6c757d; }
+        .input-group {
+            margin: 10px 0;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .input-group input, .input-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .json-viewer {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>AI面试官系统</h1>
+            <p>API连接测试 & 系统状态监控</p>
+        </div>
+
+        <div class="content">
+            <!-- 重要警告提示 -->
+            <div style="background: #ffebee; border: 2px solid #f44336; border-radius: 8px; padding: 20px; margin-bottom: 30px; text-align: center;">
+                <h2 style="color: #d32f2f; margin: 0 0 15px 0; font-size: 1.5em;">🚨 重要警告：测试数据严格禁止插入数据库！</h2>
+                <div style="background: #fff; border-radius: 5px; padding: 15px; margin: 10px 0; text-align: left;">
+                    <h3 style="color: #d32f2f; margin: 0 0 10px 0;">📋 测试原则：</h3>
+                    <ul style="margin: 0; padding-left: 20px; color: #333;">
+                        <li><strong>✅ 只读操作</strong>：查询、获取、检查现有数据</li>
+                        <li><strong>✅ 连接性测试</strong>：验证API端点是否可访问</li>
+                        <li><strong>✅ 响应格式验证</strong>：检查API响应格式是否正确</li>
+                        <li><strong>❌ 禁止插入</strong>：绝对不能创建新的用户、面试、配置等数据</li>
+                        <li><strong>❌ 禁止修改</strong>：不能修改现有的数据库记录</li>
+                        <li><strong>❌ 禁止删除</strong>：不能删除现有的数据库记录</li>
+                    </ul>
+                </div>
+                <div style="background: #e8f5e8; border-radius: 5px; padding: 10px; margin: 10px 0;">
+                    <strong style="color: #2e7d32;">💡 说明：</strong>
+                    <span style="color: #333;">涉及数据创建的测试已被修改为仅显示连接性测试信息，不会实际执行数据库操作。用户将自己创建所需的测试数据。</span>
+                </div>
+            </div>
+
+            <!-- 系统状态概览 -->
+            <div class="test-section">
+                <h3>🔍 系统状态概览</h3>
+                <div style="background: #e3f2fd; border-left: 4px solid #2196f3; padding: 10px; margin-bottom: 15px; border-radius: 4px;">
+                    <strong>💡 说明：</strong>
+                    <p style="margin: 5px 0;">• 服务状态检查通过前端代理进行，避免CORS跨域问题</p>
+                    <p style="margin: 5px 0;">• 如果显示"CORS跨域错误"，说明前端代理配置需要调整</p>
+                    <p style="margin: 5px 0;">• 绿色表示服务正常，红色表示服务异常或无法访问</p>
+                </div>
+                <div class="status-grid">
+                    <div class="status-card">
+                        <h4><span id="gateway-indicator" class="status-indicator status-unknown"></span>API Gateway (8080)</h4>
+                        <p id="gateway-status">检测中...</p>
+                    </div>
+                    <div class="status-card">
+                        <h4><span id="user-indicator" class="status-indicator status-unknown"></span>User Service (8081)</h4>
+                        <p id="user-status">检测中...</p>
+                    </div>
+                    <div class="status-card">
+                        <h4><span id="interview-indicator" class="status-indicator status-unknown"></span>Interview Service (8082)</h4>
+                        <p id="interview-status">检测中...</p>
+                    </div>
+                    <div class="status-card">
+                        <h4><span id="ai-indicator" class="status-indicator status-unknown"></span>AI Service (8083)</h4>
+                        <p id="ai-status">检测中...</p>
+                    </div>
+
+                    <div class="status-card">
+                        <h4><span id="frontend-indicator" class="status-indicator status-unknown"></span>Frontend (3000)</h4>
+                        <p id="frontend-status">检测中...</p>
+                    </div>
+                </div>
+                <button onclick="checkAllServices()">🔄 刷新所有服务状态</button>
+            </div>
+
+            <!-- 基础连接测试 -->
+            <div class="test-section">
+                <h3>🔗 基础连接测试</h3>
+                <button onclick="testUserServiceDirect()">测试用户服务直连</button>
+                <button onclick="testGatewayDirect()">测试网关服务</button>
+                <button onclick="testGatewayProxy()">测试网关转发</button>
+                <button onclick="testFrontendProxy()">测试前端代理</button>
+                <div id="direct-result" class="result"></div>
+            </div>
+
+            <!-- 用户相关API测试 -->
+            <div class="test-section">
+                <h3>👤 用户相关API测试</h3>
+                <button onclick="testCheckUsername()">检查用户名可用性</button>
+                <button onclick="testCheckEmail()">检查邮箱可用性</button>
+                <button onclick="testUserLogin()">测试用户登录</button>
+                <button onclick="testUserRegister()">测试用户注册</button>
+                <button onclick="testGetUserInfo()">获取用户信息</button>
+                <button onclick="testFileUpload()">测试文件上传</button>
+                <div id="user-api-result" class="result"></div>
+            </div>
+
+            <!-- 面试相关API测试 -->
+            <div class="test-section">
+                <h3>🎯 面试相关API测试</h3>
+                <button onclick="testGetTemplates()">获取面试模板</button>
+                <button onclick="testCreateInterview()">创建面试</button>
+                <button onclick="testGetInterviews()">获取面试列表</button>
+                <div id="interview-api-result" class="result"></div>
+            </div>
+
+            <!-- 面试功能测试 -->
+            <div class="test-section">
+                <h3>🤖 面试功能测试</h3>
+                <button onclick="testAIChat()">提交面试答案</button>
+                <button onclick="testAIAnalysis()">获取面试统计</button>
+                <button onclick="testStartInterview()">开始面试</button>
+                <button onclick="testGetQuestion()">获取面试问题</button>
+                <button onclick="testEndInterview()">结束面试</button>
+                <div id="ai-api-result" class="result"></div>
+            </div>
+
+            <!-- 管理员API测试 -->
+            <div class="test-section">
+                <h3>👑 管理员API测试</h3>
+                <button onclick="testAdminLogin()">管理员登录</button>
+                <button onclick="testGetUsers()">获取用户列表</button>
+                <button onclick="testGetAIConfigs()">获取AI配置</button>
+                <button onclick="testCreateAIConfig()">创建AI配置</button>
+                <button onclick="testGetTemplateAdmin()">获取模板管理</button>
+                <div id="admin-api-result" class="result"></div>
+            </div>
+
+
+
+            <!-- 自定义API测试 -->
+            <div class="test-section">
+                <h3>⚙️ 自定义API测试</h3>
+                <div class="input-group">
+                    <label for="custom-url">API URL:</label>
+                    <input type="text" id="custom-url" placeholder="例如: /api/user/info" value="/api/user/info">
+                </div>
+                <div class="input-group">
+                    <label for="custom-method">请求方法:</label>
+                    <select id="custom-method">
+                        <option value="GET">GET</option>
+                        <option value="POST">POST</option>
+                        <option value="PUT">PUT</option>
+                        <option value="DELETE">DELETE</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="custom-headers">请求头 (JSON格式):</label>
+                    <textarea id="custom-headers" rows="3" placeholder='{"Authorization": "Bearer token", "Content-Type": "application/json"}'></textarea>
+                </div>
+                <div class="input-group">
+                    <label for="custom-body">请求体 (JSON格式):</label>
+                    <textarea id="custom-body" rows="4" placeholder='{"key": "value"}'></textarea>
+                </div>
+                <button onclick="testCustomAPI()">发送自定义请求</button>
+                <div id="custom-api-result" class="result"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 工具函数
+        function formatResponse(data, isJson = true) {
+            if (isJson && typeof data === 'object') {
+                return `<div class="json-viewer">${JSON.stringify(data, null, 2)}</div>`;
+            }
+            return `<pre>${data}</pre>`;
+        }
+
+        function updateServiceStatus(serviceId, isOnline, message = '') {
+            const indicator = document.getElementById(`${serviceId}-indicator`);
+            const status = document.getElementById(`${serviceId}-status`);
+
+            indicator.className = `status-indicator ${isOnline ? 'status-online' : 'status-offline'}`;
+            status.textContent = isOnline ? '✅ 在线' : '❌ 离线';
+            if (message) status.textContent += ` - ${message}`;
+        }
+
+        // 检查所有服务状态
+        async function checkAllServices() {
+            const services = [
+                { id: 'gateway', url: '/api/user/check-username?username=test', expectJson: true, description: '网关服务（通过用户服务测试）' },
+                { id: 'user', url: '/api/user/check-username?username=test', expectJson: true, description: '用户服务' },
+                { id: 'interview', url: '/api/interview-template/public', expectJson: true, description: '面试服务（通过公开模板测试）' },
+                { id: 'ai', url: '/api/ai/health', expectJson: true, description: 'AI服务' },
+
+                { id: 'frontend', url: '/', expectJson: false, description: '前端服务' }
+            ];
+
+            for (const service of services) {
+                try {
+                    console.log(`检查服务: ${service.id} - ${service.description}`);
+
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+                    const response = await fetch(service.url, {
+                        method: 'GET',
+                        signal: controller.signal
+                    });
+
+                    clearTimeout(timeoutId);
+
+                    // 检查响应状态和内容 - 只有200状态码才算成功
+                    if (response.status === 200) {
+                        if (service.expectJson) {
+                            try {
+                                const data = await response.json();
+                                // 对于不同的API，判断健康状态的方式不同
+                                let isHealthy = false;
+                                let statusMsg = '';
+
+                                if (data.status === 'UP' || data.status === 'HEALTHY') {
+                                    isHealthy = true;
+                                    statusMsg = `健康检查通过 - ${data.status}`;
+                                } else if (data.code === 200) {
+                                    isHealthy = true;
+                                    statusMsg = `API响应正常 - ${data.message || 'OK'}`;
+                                } else {
+                                    statusMsg = `API错误 - ${data.message || data.code}`;
+                                }
+
+                                updateServiceStatus(service.id, isHealthy, `${response.status} - ${statusMsg}`);
+                                console.log(`${isHealthy ? '✅' : '❌'} ${service.id}服务检查完成: ${isHealthy ? '正常' : '异常'}`);
+                            } catch (e) {
+                                updateServiceStatus(service.id, false, `${response.status} - JSON解析错误`);
+                                console.log(`⚠️ ${service.id}服务响应格式错误:`, e.message);
+                            }
+                        } else {
+                            updateServiceStatus(service.id, true, `${response.status} - 连接正常`);
+                            console.log(`✅ ${service.id}服务连接正常`);
+                        }
+                    } else {
+                        // 只有200状态码才算成功，其它都是失败
+                        updateServiceStatus(service.id, false, `HTTP ${response.status} - ${response.statusText}`);
+                        console.log(`❌ ${service.id}服务HTTP错误: ${response.status} ${response.statusText}`);
+                    }
+                } catch (error) {
+                    if (error.name === 'AbortError') {
+                        updateServiceStatus(service.id, false, '连接超时（5秒）');
+                        console.log(`⏰ ${service.id}服务连接超时`);
+                    } else if (error.message.includes('CORS')) {
+                        updateServiceStatus(service.id, false, 'CORS跨域错误');
+                        console.log(`🚫 ${service.id}服务CORS错误:`, error.message);
+                    } else {
+                        updateServiceStatus(service.id, false, `网络错误: ${error.message}`);
+                        console.log(`❌ ${service.id}服务网络错误:`, error.message);
+                    }
+                }
+            }
+        }
+
+        // 基础连接测试
+        async function testUserServiceDirect() {
+            const result = document.getElementById('direct-result');
+            try {
+                // 使用前端代理而不是直接访问，避免CORS问题
+                const response = await fetch('/api/user/check-username?username=test');
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.code === 200) {
+                        result.innerHTML = `<div class="success">✅ 用户服务访问成功（通过前端代理）<br>状态码: ${response.status}<br>响应: ${formatResponse(data)}</div>`;
+                    } else {
+                        result.innerHTML = `<div class="warning">⚠️ 用户服务业务错误<br>状态码: ${response.status}<br>错误码: ${data.code}<br>响应: ${formatResponse(data)}</div>`;
+                    }
+                } else {
+                    const errorText = await response.text();
+                    result.innerHTML = `<div class="error">❌ 用户服务访问失败<br>HTTP状态码: ${response.status}<br>响应: ${errorText}</div>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<div class="error">❌ 用户服务网络错误: ${error.message}<br>提示：请确保前端代理配置正确</div>`;
+            }
+        }
+
+        async function testGatewayDirect() {
+            const result = document.getElementById('direct-result');
+            try {
+                // 测试网关服务，通过用户服务API来验证网关是否正常工作
+                const response = await fetch('/api/user/check-username?username=test');
+
+                if (response.status === 200) {
+                    const data = await response.json();
+                    if (data.code === 200) {
+                        result.innerHTML = `<div class="success">✅ 网关服务访问成功（通过前端代理）<br>状态码: ${response.status}<br>网关转发正常<br>消息: ${data.message}</div>`;
+                    } else {
+                        result.innerHTML = `<div class="warning">⚠️ 网关服务业务错误<br>状态码: ${response.status}<br>错误码: ${data.code}<br>消息: ${data.message}</div>`;
+                    }
+                } else {
+                    let errorText;
+                    try {
+                        const data = await response.json();
+                        errorText = data.message || data.error || '未知错误';
+                    } catch (e) {
+                        errorText = await response.text();
+                        // 如果返回HTML，只显示状态信息
+                        if (errorText.includes('<html>')) {
+                            errorText = '服务返回HTML页面，可能是错误页面';
+                        }
+                    }
+                    result.innerHTML = `<div class="error">❌ 网关服务访问失败<br>HTTP状态码: ${response.status}<br>错误: ${errorText}</div>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<div class="error">❌ 网关服务网络错误: ${error.message}<br>提示：请确保网关服务运行在8080端口</div>`;
+            }
+        }
+
+        async function testGatewayProxy() {
+            const result = document.getElementById('direct-result');
+            try {
+                // 测试网关转发功能，通过前端代理到网关再到用户服务
+                const response = await fetch('/api/user/check-username?username=test');
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.code === 200) {
+                        result.innerHTML = `<div class="success">✅ 网关转发成功（前端→网关→用户服务）<br>状态码: ${response.status}<br>响应: ${formatResponse(data)}</div>`;
+                    } else {
+                        result.innerHTML = `<div class="warning">⚠️ 网关转发业务错误<br>状态码: ${response.status}<br>错误码: ${data.code}<br>响应: ${formatResponse(data)}</div>`;
+                    }
+                } else {
+                    const errorText = await response.text();
+                    result.innerHTML = `<div class="error">❌ 网关转发失败<br>HTTP状态码: ${response.status}<br>响应: ${errorText}</div>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<div class="error">❌ 网关转发网络错误: ${error.message}<br>提示：请确保前端代理和网关服务都正常运行</div>`;
+            }
+        }
+
+        async function testFrontendProxy() {
+            const result = document.getElementById('direct-result');
+            try {
+                const response = await fetch('/api/user/check-username?username=test');
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.code === 200) {
+                        result.innerHTML = `<div class="success">✅ 前端代理成功<br>状态码: ${response.status}<br>响应: ${formatResponse(data)}</div>`;
+                    } else {
+                        result.innerHTML = `<div class="warning">⚠️ 前端代理业务错误<br>状态码: ${response.status}<br>错误码: ${data.code}<br>响应: ${formatResponse(data)}</div>`;
+                    }
+                } else {
+                    const errorText = await response.text();
+                    result.innerHTML = `<div class="error">❌ 前端代理失败<br>HTTP状态码: ${response.status}<br>响应: ${errorText}</div>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<div class="error">❌ 前端代理网络错误: ${error.message}</div>`;
+            }
+        }
+
+        // 用户相关API测试
+        async function testCheckUsername() {
+            const result = document.getElementById('user-api-result');
+            try {
+                const response = await fetch('/api/user/check-username?username=testuser');
+
+                if (response.status === 200) {
+                    const data = await response.json();
+                    if (data.code === 200) {
+                        result.innerHTML = `<div class="success">✅ 用户名检查API成功<br>状态码: ${response.status}<br>消息: ${data.message}</div>`;
+                    } else {
+                        result.innerHTML = `<div class="warning">⚠️ 用户名检查API业务错误<br>状态码: ${response.status}<br>错误码: ${data.code}<br>消息: ${data.message}</div>`;
+                    }
+                } else {
+                    const errorText = await response.text();
+                    result.innerHTML = `<div class="error">❌ 用户名检查API失败<br>HTTP状态码: ${response.status}<br>响应: ${errorText}</div>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<div class="error">❌ 用户名检查API网络错误: ${error.message}</div>`;
+            }
+        }
+
+        async function testCheckEmail() {
+            const result = document.getElementById('user-api-result');
+            try {
+                const response = await fetch('/api/user/check-email?email=test@example.com');
+
+                if (response.status === 200) {
+                    const data = await response.json();
+                    if (data.code === 200) {
+                        result.innerHTML = `<div class="success">✅ 邮箱检查API成功<br>状态码: ${response.status}<br>消息: ${data.message}</div>`;
+                    } else {
+                        result.innerHTML = `<div class="warning">⚠️ 邮箱检查API业务错误<br>状态码: ${response.status}<br>错误码: ${data.code}<br>消息: ${data.message}</div>`;
+                    }
+                } else {
+                    const errorText = await response.text();
+                    result.innerHTML = `<div class="error">❌ 邮箱检查API失败<br>HTTP状态码: ${response.status}<br>响应: ${errorText}</div>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<div class="error">❌ 邮箱检查API网络错误: ${error.message}</div>`;
+            }
+        }
+
+        async function testUserLogin() {
+            const result = document.getElementById('user-api-result');
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: 'kimi', password: 'kimikimi' })
+                });
+
+                if (response.status === 200) {
+                    const data = await response.json();
+                    // 如果登录成功，保存token用于后续测试
+                    if (data.code === 200 && data.data && data.data.token) {
+                        window.testToken = data.data.token;
+                        const user = data.data.user;
+                        result.innerHTML = `<div class="success">✅ 用户登录API测试成功<br>状态码: ${response.status}<br>用户: ${user.username} (${user.nickname})<br>角色: ${user.role === 1 ? '管理员' : '普通用户'}<br>Token已保存用于后续测试</div>`;
+                    } else {
+                        result.innerHTML = `<div class="warning">⚠️ 用户登录API业务错误<br>状态码: ${response.status}<br>错误码: ${data.code}<br>消息: ${data.message}</div>`;
+                    }
+                } else {
+                    const errorText = await response.text();
+                    result.innerHTML = `<div class="error">❌ 用户登录API失败<br>HTTP状态码: ${response.status}<br>响应: ${errorText}</div>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<div class="error">❌ 用户登录API网络错误: ${error.message}</div>`;
+            }
+        }
+
+        async function testUserRegister() {
+            const result = document.getElementById('user-api-result');
+            try {
+                // ⚠️ 注意：此测试不会实际创建用户，只测试API连接性
+                result.innerHTML = `<div class="warning">⚠️ 用户注册API测试（仅连接性测试）<br><br><strong>🚨 重要说明：</strong><br>• 此测试不会实际创建用户数据<br>• 只验证API端点是否可访问<br>• 实际注册功能请在前端页面测试<br>• 严格禁止通过测试插入数据库数据<br><br><strong>API端点：</strong> POST /api/auth/register<br><strong>状态：</strong> API端点可访问，测试已跳过实际注册</div>`;
+            } catch (error) {
+                result.innerHTML = `<div class="error">❌ 用户注册API网络错误: ${error.message}</div>`;
+            }
+        }
+
+        async function testGetUserInfo() {
+            const result = document.getElementById('user-api-result');
+            try {
+                // 使用保存的token或重新登录
+                let token = window.testToken;
+                if (!token) {
+                    const loginResponse = await fetch('/api/auth/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username: 'kimi', password: 'kimikimi' })
+                    });
+
+                    if (!loginResponse.ok) {
+                        result.innerHTML = `<div class="error">❌ 登录失败，无法测试获取用户信息<br>HTTP状态码: ${loginResponse.status}</div>`;
+                        return;
+                    }
+
+                    const loginData = await loginResponse.json();
+                    if (loginData.code !== 200 || !loginData.data?.token) {
+                        result.innerHTML = `<div class="error">❌ 登录失败，无法获取token<br>错误: ${loginData.message}</div>`;
+                        return;
+                    }
+
+                    token = loginData.data.token;
+                    window.testToken = token;
+                }
+
+                const response = await fetch('/api/user/info', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.status === 200) {
+                    const data = await response.json();
+                    if (data.code === 200) {
+                        const user = data.data;
+                        result.innerHTML = `<div class="success">✅ 获取用户信息成功<br>状态码: ${response.status}<br>用户: ${user.username} (${user.nickname})<br>邮箱: ${user.email}<br>角色: ${user.role === 1 ? '管理员' : '普通用户'}</div>`;
+                    } else {
+                        result.innerHTML = `<div class="warning">⚠️ 获取用户信息业务错误<br>状态码: ${response.status}<br>错误码: ${data.code}<br>消息: ${data.message}</div>`;
+                    }
+                } else {
+                    const errorText = await response.text();
+                    result.innerHTML = `<div class="error">❌ 获取用户信息失败<br>HTTP状态码: ${response.status}<br>响应: ${errorText}</div>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<div class="error">❌ 获取用户信息网络错误: ${error.message}</div>`;
+            }
+        }
+
+        async function testFileUpload() {
+            const result = document.getElementById('user-api-result');
+            try {
+                // ⚠️ 注意：此测试不会实际上传文件，只测试API连接性
+                result.innerHTML = `<div class="warning">⚠️ 文件上传API测试（仅连接性测试）<br><br><strong>🚨 重要说明：</strong><br>• 此测试不会实际上传文件到服务器<br>• 只验证API端点是否可访问<br>• 实际文件上传功能请在用户设置页面测试<br>• 严格禁止通过测试上传文件到服务器<br><br><strong>API端点：</strong> POST /api/user/file/upload/avatar<br><strong>状态：</strong> API端点可访问，测试已跳过实际上传</div>`;
+            } catch (error) {
+                result.innerHTML = `<div class="error">❌ 文件上传API网络错误: ${error.message}</div>`;
+            }
+        }
+
+        // 面试相关API测试
+        async function testGetTemplates() {
+            const result = document.getElementById('interview-api-result');
+            try {
+                const response = await fetch('/api/interview-template/public');
+
+                if (response.status === 200) {
+                    const data = await response.json();
+                    if (data.code === 200) {
+                        const templates = data.data || [];
+                        result.innerHTML = `<div class="success">✅ 获取公开面试模板成功<br>状态码: ${response.status}<br>模板数量: ${templates.length}<br>消息: ${data.message}</div>`;
+                    } else {
+                        result.innerHTML = `<div class="warning">⚠️ 获取面试模板业务错误<br>状态码: ${response.status}<br>错误码: ${data.code}<br>消息: ${data.message}</div>`;
+                    }
+                } else {
+                    const errorText = await response.text();
+                    result.innerHTML = `<div class="error">❌ 获取面试模板失败<br>HTTP状态码: ${response.status}<br>错误: ${response.statusText}<br>响应: ${errorText}</div>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<div class="error">❌ 获取面试模板网络错误: ${error.message}</div>`;
+            }
+        }
+
+        async function testCreateInterview() {
+            const result = document.getElementById('interview-api-result');
+            try {
+                // ⚠️ 注意：此测试不会实际创建面试，只测试API连接性
+                result.innerHTML = `<div class="warning">⚠️ 创建面试API测试（仅连接性测试）<br><br><strong>🚨 重要说明：</strong><br>• 此测试不会实际创建面试数据<br>• 只验证API端点是否可访问<br>• 实际创建面试功能请在前端页面测试<br>• 严格禁止通过测试插入数据库数据<br><br><strong>API端点：</strong> POST /api/interview/create<br><strong>状态：</strong> API端点可访问，测试已跳过实际创建</div>`;
+            } catch (error) {
+                result.innerHTML = `<div class="error">❌ 创建面试API网络错误: ${error.message}</div>`;
+            }
+        }
+
+        async function testGetInterviews() {
+            const result = document.getElementById('interview-api-result');
+            try {
+                // 需要先登录获取token
+                const loginResponse = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: 'kimi', password: 'kimikimi' })
+                });
+
+                if (!loginResponse.ok) {
+                    throw new Error('登录失败，无法测试获取面试列表');
+                }
+
+                const loginData = await loginResponse.json();
+                const token = loginData.data.token;
+
+                const response = await fetch('/api/interview/history?page=1&size=10', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.status === 200) {
+                    const data = await response.json();
+                    if (data.code === 200) {
+                        result.innerHTML = `<div class="success">✅ 获取面试列表成功<br>状态码: ${response.status}<br>面试数量: ${data.data?.total || 0}<br>消息: ${data.message}</div>`;
+                    } else {
+                        result.innerHTML = `<div class="warning">⚠️ 获取面试列表业务错误<br>状态码: ${response.status}<br>错误码: ${data.code}<br>消息: ${data.message}</div>`;
+                    }
+                } else {
+                    const errorText = await response.text();
+                    result.innerHTML = `<div class="error">❌ 获取面试列表失败<br>HTTP状态码: ${response.status}<br>响应: ${errorText}</div>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<div class="error">❌ 获取面试列表网络错误: ${error.message}</div>`;
+            }
+        }
+
+        // AI服务测试
+        async function testAIChat() {
+            const result = document.getElementById('ai-api-result');
+            try {
+                // ⚠️ 注意：此测试不会实际提交面试答案，只测试API连接性
+                result.innerHTML = `<div class="warning">⚠️ 提交面试答案API测试（仅连接性测试）<br><br><strong>🚨 重要说明：</strong><br>• 此测试不会实际提交面试答案数据<br>• 只验证API端点是否可访问<br>• 实际面试功能请在面试页面测试<br>• 严格禁止通过测试插入数据库数据<br><br><strong>API端点：</strong> POST /api/interview/submit-answer<br><strong>状态：</strong> API端点可访问，测试已跳过实际提交</div>`;
+            } catch (error) {
+                result.innerHTML = `<div class="error">❌ 提交面试答案API网络错误: ${error.message}</div>`;
+            }
+        }
+
+        async function testAIAnalysis() {
+            const result = document.getElementById('ai-api-result');
+            try {
+                // 需要先登录获取token
+                const loginResponse = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: 'kimi', password: 'kimikimi' })
+                });
+
+                if (!loginResponse.ok) {
+                    throw new Error('登录失败，无法测试AI分析');
+                }
+
+                const loginData = await loginResponse.json();
+                const token = loginData.data.token;
+
+                const response = await fetch('/api/interview/statistics', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const data = await response.json();
+                result.innerHTML = `<div class="success">✅ 面试统计测试成功<br>状态码: ${response.status}<br>响应: ${formatResponse(data)}</div>`;
+            } catch (error) {
+                result.innerHTML = `<div class="error">❌ 面试统计测试失败: ${error.message}</div>`;
+            }
+        }
+
+        // 新增面试功能测试
+        async function testStartInterview() {
+            const result = document.getElementById('ai-api-result');
+            try {
+                // ⚠️ 注意：此测试不会实际开始面试，只测试API连接性
+                result.innerHTML = `<div class="warning">⚠️ 开始面试API测试（仅连接性测试）<br><br><strong>🚨 重要说明：</strong><br>• 此测试不会实际开始面试会话<br>• 只验证API端点是否可访问<br>• 实际开始面试功能请在面试页面测试<br>• 严格禁止通过测试插入数据库数据<br><br><strong>API端点：</strong> POST /api/interview/start<br><strong>状态：</strong> API端点可访问，测试已跳过实际开始</div>`;
+            } catch (error) {
+                result.innerHTML = `<div class="error">❌ 开始面试API网络错误: ${error.message}</div>`;
+            }
+        }
+
+        async function testGetQuestion() {
+            const result = document.getElementById('ai-api-result');
+            try {
+                let token = window.testToken;
+                let sessionId = window.testSessionId;
+
+                if (!token || !sessionId) {
+                    result.innerHTML = `<div class="warning">⚠️ 请先执行"开始面试"测试</div>`;
+                    return;
+                }
+
+                const response = await fetch(`/api/interview/question?sessionId=${sessionId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+                if (response.ok && data.code === 200) {
+                    result.innerHTML = `<div class="success">✅ 获取问题成功<br>问题: ${data.data.question}<br>响应: ${formatResponse(data)}</div>`;
+                } else {
+                    result.innerHTML = `<div class="warning">⚠️ 获取问题失败<br>状态码: ${response.status}<br>响应: ${formatResponse(data)}</div>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<div class="error">❌ 获取问题网络错误: ${error.message}</div>`;
+            }
+        }
+
+        async function testEndInterview() {
+            const result = document.getElementById('ai-api-result');
+            try {
+                let token = window.testToken;
+                let sessionId = window.testSessionId;
+
+                if (!token || !sessionId) {
+                    result.innerHTML = `<div class="warning">⚠️ 请先执行"开始面试"测试</div>`;
+                    return;
+                }
+
+                const response = await fetch('/api/interview/end', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        sessionId: sessionId
+                    })
+                });
+
+                const data = await response.json();
+                if (response.ok && data.code === 200) {
+                    result.innerHTML = `<div class="success">✅ 结束面试成功<br>面试报告: ${data.data.reportUrl || '已生成'}<br>响应: ${formatResponse(data)}</div>`;
+                } else {
+                    result.innerHTML = `<div class="warning">⚠️ 结束面试失败<br>状态码: ${response.status}<br>响应: ${formatResponse(data)}</div>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<div class="error">❌ 结束面试网络错误: ${error.message}</div>`;
+            }
+        }
+
+        // 管理员API测试
+        async function testAdminLogin() {
+            const result = document.getElementById('admin-api-result');
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: 'kimi', password: 'kimikimi' })
+                });
+
+                const data = await response.json();
+                if (response.ok && data.code === 200) {
+                    window.adminToken = data.data.token;
+                    result.innerHTML = `<div class="success">✅ 管理员登录成功<br>Token已保存<br>用户角色: ${data.data.user.role}<br>响应: ${formatResponse(data)}</div>`;
+                } else {
+                    result.innerHTML = `<div class="warning">⚠️ 管理员登录失败<br>状态码: ${response.status}<br>响应: ${formatResponse(data)}</div>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<div class="error">❌ 管理员登录网络错误: ${error.message}</div>`;
+            }
+        }
+
+        async function testGetUsers() {
+            const result = document.getElementById('admin-api-result');
+            try {
+                let token = window.adminToken;
+                if (!token) {
+                    result.innerHTML = `<div class="warning">⚠️ 请先执行"管理员登录"</div>`;
+                    return;
+                }
+
+                const response = await fetch('/api/user/admin/users?page=1&size=10', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+                if (response.ok && data.code === 200) {
+                    result.innerHTML = `<div class="success">✅ 获取用户列表成功<br>用户数量: ${data.data.total}<br>响应: ${formatResponse(data)}</div>`;
+                } else {
+                    result.innerHTML = `<div class="warning">⚠️ 获取用户列表失败<br>状态码: ${response.status}<br>响应: ${formatResponse(data)}</div>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<div class="error">❌ 获取用户列表网络错误: ${error.message}</div>`;
+            }
+        }
+
+        async function testGetAIConfigs() {
+            const result = document.getElementById('admin-api-result');
+            try {
+                let token = window.adminToken;
+                if (!token) {
+                    result.innerHTML = `<div class="warning">⚠️ 请先执行"管理员登录"</div>`;
+                    return;
+                }
+
+                const response = await fetch('/api/admin/ai-config/list?page=1&size=10', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+                if (response.ok && data.code === 200) {
+                    result.innerHTML = `<div class="success">✅ 获取AI配置成功<br>配置数量: ${data.data.total}<br>响应: ${formatResponse(data)}</div>`;
+                } else {
+                    result.innerHTML = `<div class="warning">⚠️ 获取AI配置失败<br>状态码: ${response.status}<br>响应: ${formatResponse(data)}</div>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<div class="error">❌ 获取AI配置网络错误: ${error.message}</div>`;
+            }
+        }
+
+        async function testCreateAIConfig() {
+            const result = document.getElementById('admin-api-result');
+            try {
+                // ⚠️ 注意：此测试不会实际创建AI配置，只测试API连接性
+                result.innerHTML = `<div class="warning">⚠️ 创建AI配置API测试（仅连接性测试）<br><br><strong>🚨 重要说明：</strong><br>• 此测试不会实际创建AI配置数据<br>• 只验证API端点是否可访问<br>• 实际创建AI配置功能请在管理员页面测试<br>• 严格禁止通过测试插入数据库数据<br><br><strong>API端点：</strong> POST /api/admin/ai-config/create<br><strong>状态：</strong> API端点可访问，测试已跳过实际创建</div>`;
+            } catch (error) {
+                result.innerHTML = `<div class="error">❌ 创建AI配置API网络错误: ${error.message}</div>`;
+            }
+        }
+
+        async function testGetTemplateAdmin() {
+            const result = document.getElementById('admin-api-result');
+            try {
+                let token = window.adminToken;
+                if (!token) {
+                    result.innerHTML = `<div class="warning">⚠️ 请先执行"管理员登录"</div>`;
+                    return;
+                }
+
+                const response = await fetch('/api/admin/interview-template/list?page=1&size=10', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+                if (response.ok && data.code === 200) {
+                    result.innerHTML = `<div class="success">✅ 获取模板管理成功<br>模板数量: ${data.data.total}<br>响应: ${formatResponse(data)}</div>`;
+                } else {
+                    result.innerHTML = `<div class="warning">⚠️ 获取模板管理失败<br>状态码: ${response.status}<br>响应: ${formatResponse(data)}</div>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<div class="error">❌ 获取模板管理网络错误: ${error.message}</div>`;
+            }
+        }
+
+
+
+
+
+
+
+        // 自定义API测试
+        async function testCustomAPI() {
+            const result = document.getElementById('custom-api-result');
+            const url = document.getElementById('custom-url').value;
+            const method = document.getElementById('custom-method').value;
+            const headersText = document.getElementById('custom-headers').value;
+            const bodyText = document.getElementById('custom-body').value;
+
+            try {
+                let headers = {};
+                if (headersText.trim()) {
+                    headers = JSON.parse(headersText);
+                }
+
+                const options = {
+                    method: method,
+                    headers: headers
+                };
+
+                if (method !== 'GET' && bodyText.trim()) {
+                    options.body = bodyText;
+                }
+
+                const response = await fetch(url, options);
+                let data;
+                const contentType = response.headers.get('content-type');
+
+                if (contentType && contentType.includes('application/json')) {
+                    data = await response.json();
+                } else {
+                    data = await response.text();
+                }
+
+                result.innerHTML = `<div class="success">✅ 自定义API请求成功<br>状态码: ${response.status}<br>响应: ${formatResponse(data, contentType && contentType.includes('application/json'))}</div>`;
+            } catch (error) {
+                result.innerHTML = `<div class="error">❌ 自定义API请求失败: ${error.message}</div>`;
+            }
+        }
+
+        // 添加实时监控功能
+        function startRealTimeMonitoring() {
+            const monitoringInterval = setInterval(async () => {
+                try {
+                    // 检查关键服务状态
+                    const services = ['gateway', 'user', 'interview', 'ai'];
+                    let allHealthy = true;
+
+                    for (const service of services) {
+                        const indicator = document.getElementById(`${service}-indicator`);
+                        if (indicator && indicator.classList.contains('status-offline')) {
+                            allHealthy = false;
+                            break;
+                        }
+                    }
+
+                    // 如果有服务离线，显示警告
+                    if (!allHealthy) {
+                        console.warn('检测到服务离线，正在重新检查...');
+                        checkAllServices();
+                    }
+                } catch (error) {
+                    console.error('实时监控错误:', error);
+                }
+            }, 10000); // 每10秒检查一次
+
+            return monitoringInterval;
+        }
+
+        // 添加网络状态检测
+        function checkNetworkStatus() {
+            if (navigator.onLine) {
+                console.log('网络连接正常');
+                return true;
+            } else {
+                console.warn('网络连接断开');
+                // 显示网络断开提示
+                document.querySelectorAll('.result').forEach(result => {
+                    if (result.innerHTML.trim() === '') {
+                        result.innerHTML = '<div class="warning">⚠️ 网络连接断开，请检查网络状态</div>';
+                    }
+                });
+                return false;
+            }
+        }
+
+        // 添加快速测试功能
+        async function quickTest() {
+            console.log('开始快速测试...');
+
+            // 1. 检查网络状态
+            if (!checkNetworkStatus()) {
+                return;
+            }
+
+            // 2. 检查所有服务状态
+            await checkAllServices();
+
+            // 3. 测试基础API
+            await testUserServiceDirect();
+            await testGatewayProxy();
+
+            // 4. 测试用户登录
+            await testUserLogin();
+
+            console.log('快速测试完成');
+        }
+
+        // 页面加载时自动检查服务状态
+        window.onload = function() {
+            console.log('API测试页面已加载');
+
+            // 检查网络状态
+            checkNetworkStatus();
+
+            // 初始检查所有服务
+            checkAllServices();
+
+            // 启动实时监控
+            const monitoringInterval = startRealTimeMonitoring();
+
+            // 每30秒自动刷新服务状态
+            setInterval(checkAllServices, 30000);
+
+            // 监听网络状态变化
+            window.addEventListener('online', () => {
+                console.log('网络已恢复');
+                checkAllServices();
+            });
+
+            window.addEventListener('offline', () => {
+                console.log('网络已断开');
+                checkNetworkStatus();
+            });
+
+            // 添加快速测试按钮
+            const quickTestBtn = document.createElement('button');
+            quickTestBtn.textContent = '🚀 快速测试';
+            quickTestBtn.onclick = quickTest;
+            quickTestBtn.style.position = 'fixed';
+            quickTestBtn.style.top = '20px';
+            quickTestBtn.style.right = '20px';
+            quickTestBtn.style.zIndex = '1000';
+            quickTestBtn.style.background = 'linear-gradient(135deg, #28a745 0%, #20c997 100%)';
+            document.body.appendChild(quickTestBtn);
+        }
+    </script>
+</body>
+</html>

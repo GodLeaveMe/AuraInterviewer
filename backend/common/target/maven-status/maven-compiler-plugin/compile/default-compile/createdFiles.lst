@@ -1,0 +1,4 @@
+com\aiinterviewer\common\result\ResultCode.class
+com\aiinterviewer\common\utils\JwtUtils.class
+com\aiinterviewer\common\entity\BaseEntity.class
+com\aiinterviewer\common\result\Result.class

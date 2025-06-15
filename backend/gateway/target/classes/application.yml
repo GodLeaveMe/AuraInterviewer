@@ -1,0 +1,149 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: gateway
+  profiles:
+    active: dev
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        # 管理员服务路由 - 必须在用户服务路由之前
+        - id: admin-service
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/user/admin/**
+          filters:
+            - StripPrefix=2
+
+        # 用户服务文件上传路由（优先级更高，放在前面）
+        - id: user-service-file
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/user-service/**
+          filters:
+            - StripPrefix=2
+
+        # 用户服务路由
+        - id: user-service
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/user/**
+          filters:
+            - StripPrefix=1
+        
+        # 面试服务路由
+        - id: interview-service
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/interview/**
+          filters:
+            - StripPrefix=1
+
+        # 面试模板服务路由
+        - id: interview-template-service
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/interview-template/**
+          filters:
+            - StripPrefix=1
+
+        # AI服务路由
+        - id: ai-service
+          uri: http://localhost:8083
+          predicates:
+            - Path=/api/ai/**
+          filters:
+            - StripPrefix=1
+
+        # AI管理服务路由
+        - id: ai-admin-service
+          uri: http://localhost:8083
+          predicates:
+            - Path=/api/admin/ai-config/**
+          filters:
+            - StripPrefix=1
+
+        # 面试模板管理路由
+        - id: interview-template-admin-service
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/admin/interview-template/**
+          filters:
+            - StripPrefix=1
+
+        # API配置管理路由
+        - id: api-config-admin-service
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/admin/api-config/**
+          filters:
+            - StripPrefix=1
+
+
+      
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:3000"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: true
+            maxAge: 3600
+
+
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE:http://localhost:8761/eureka}
+    fetch-registry: true
+    register-with-eureka: true
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${server.port}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    com.aiinterviewer: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{50} - %msg%n"
+
+# JWT配置
+jwt:
+  secret: ai-interviewer-secret-key-for-jwt-token-generation
+  expiration: 86400
+
+---
+spring:
+  config:
+    activate:
+      on-profile: docker
+  data:
+    redis:
+      host: redis
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka:8761/eureka

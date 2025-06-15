@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aiinterviewer.user.mapper.UserMapper">
+
+    <!-- 根据用户名查询用户 -->
+    <select id="findByUsername" resultType="com.aiinterviewer.user.entity.User">
+        SELECT * FROM user
+        WHERE username = #{username} AND (deleted = 0 OR deleted IS NULL)
+    </select>
+
+    <!-- 根据邮箱查询用户 -->
+    <select id="findByEmail" resultType="com.aiinterviewer.user.entity.User">
+        SELECT * FROM user
+        WHERE email = #{email} AND (deleted = 0 OR deleted IS NULL)
+    </select>
+
+    <!-- 根据用户名或邮箱查询用户 -->
+    <select id="findByUsernameOrEmail" resultType="com.aiinterviewer.user.entity.User">
+        SELECT * FROM user
+        WHERE (username = #{username} OR email = #{email}) AND (deleted = 0 OR deleted IS NULL)
+    </select>
+
+    <!-- 检查用户名是否存在 -->
+    <select id="existsByUsername" resultType="boolean">
+        SELECT COUNT(1) > 0 FROM user
+        WHERE username = #{username} AND (deleted = 0 OR deleted IS NULL)
+    </select>
+
+    <!-- 检查邮箱是否存在 -->
+    <select id="existsByEmail" resultType="boolean">
+        SELECT COUNT(1) > 0 FROM user
+        WHERE email = #{email} AND (deleted = 0 OR deleted IS NULL)
+    </select>
+
+    <!-- 更新最后登录信息 -->
+    <update id="updateLastLoginInfo">
+        UPDATE user
+        SET last_login_time = #{loginTime},
+            last_login_ip = #{loginIp},
+            update_time = NOW()
+        WHERE id = #{userId} AND (deleted = 0 OR deleted IS NULL)
+    </update>
+
+</mapper>

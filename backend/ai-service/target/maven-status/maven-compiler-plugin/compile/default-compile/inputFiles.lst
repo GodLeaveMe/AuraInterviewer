@@ -1,0 +1,15 @@
+C:\Users\HelloMyKiMi\Desktop\AI面试官\backend\ai-service\src\main\java\com\aiinterviewer\ai\entity\AiConfig.java
+C:\Users\HelloMyKiMi\Desktop\AI面试官\backend\ai-service\src\main\java\com\aiinterviewer\ai\service\impl\AiChatServiceImpl.java
+C:\Users\HelloMyKiMi\Desktop\AI面试官\backend\ai-service\src\main\java\com\aiinterviewer\ai\controller\AiConfigController.java
+C:\Users\HelloMyKiMi\Desktop\AI面试官\backend\ai-service\src\main\java\com\aiinterviewer\ai\controller\AiController.java
+C:\Users\HelloMyKiMi\Desktop\AI面试官\backend\ai-service\src\main\java\com\aiinterviewer\ai\dto\ChatRequest.java
+C:\Users\HelloMyKiMi\Desktop\AI面试官\backend\ai-service\src\main\java\com\aiinterviewer\ai\AiServiceApplication.java
+C:\Users\HelloMyKiMi\Desktop\AI面试官\backend\ai-service\src\main\java\com\aiinterviewer\ai\service\impl\AiConfigServiceImpl.java
+C:\Users\HelloMyKiMi\Desktop\AI面试官\backend\ai-service\src\main\java\com\aiinterviewer\ai\client\UserServiceClient.java
+C:\Users\HelloMyKiMi\Desktop\AI面试官\backend\ai-service\src\main\java\com\aiinterviewer\ai\config\RestTemplateConfig.java
+C:\Users\HelloMyKiMi\Desktop\AI面试官\backend\ai-service\src\main\java\com\aiinterviewer\ai\dto\AiConfigRequest.java
+C:\Users\HelloMyKiMi\Desktop\AI面试官\backend\ai-service\src\main\java\com\aiinterviewer\ai\service\AiChatService.java
+C:\Users\HelloMyKiMi\Desktop\AI面试官\backend\ai-service\src\main\java\com\aiinterviewer\ai\dto\ChatResponse.java
+C:\Users\HelloMyKiMi\Desktop\AI面试官\backend\ai-service\src\main\java\com\aiinterviewer\ai\mapper\AiConfigMapper.java
+C:\Users\HelloMyKiMi\Desktop\AI面试官\backend\ai-service\src\main\java\com\aiinterviewer\ai\util\AuthUtils.java
+C:\Users\HelloMyKiMi\Desktop\AI面试官\backend\ai-service\src\main\java\com\aiinterviewer\ai\service\AiConfigService.java
